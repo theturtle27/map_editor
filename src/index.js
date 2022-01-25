@@ -4,9 +4,11 @@ import "./index.css";
 
 function Square(props) {
   return (
-    <button className="square" onClick={props.onClick}>
-      {props.value}
-    </button>
+    <button
+      style={{ backgroundColor: props.value === "@" ? "black" : null }}
+      className="square"
+      onClick={props.onClick}
+    />
   );
 }
 
@@ -16,7 +18,10 @@ class Board extends React.Component {
     this.state = {
       squares: Array().fill(null),
       obstacleIsTrue: true,
+      row: 0,
+      col: 0,
     };
+    // this.exportData = this.exportData.bind(this);
   }
 
   handleClick(i) {
@@ -25,16 +30,23 @@ class Board extends React.Component {
     this.setState({ squares: squares });
   }
 
-  exportData() {
-    const jsonString = `data:text/json;chatset=utf-8,${encodeURIComponent(
-      JSON.stringify(this.state.squares.slice())
+  exportData = () => {
+    console.log(
+      "Dwnload",
+      this.state.row,
+      "row here",
+      this.state.col,
+      "col here"
+    );
+    // console.log(this.state.squares);
+    const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
+      JSON.stringify(this.state.squares)
     )}`;
     const link = document.createElement("a");
     link.href = jsonString;
     link.download = "data.json";
-
     link.click();
-  }
+  };
 
   renderSquare(i) {
     return (
@@ -63,6 +75,7 @@ class Board extends React.Component {
         </div>
       );
     }
+    // this.setState({ row });
     return (
       <div>
         <div className="gridtitle">{gridtitle}</div>
@@ -79,7 +92,7 @@ class Board extends React.Component {
           >
             Erase
           </button>
-          <button className="Download" onClick={this.exportData()}>
+          <button className="Download" onClick={() => this.exportData()}>
             Download
           </button>
         </div>
