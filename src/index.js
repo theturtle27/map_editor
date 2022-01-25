@@ -25,6 +25,17 @@ class Board extends React.Component {
     this.setState({ squares: squares });
   }
 
+  exportData() {
+    const jsonString = `data:text/json;chatset=utf-8,${encodeURIComponent(
+      JSON.stringify(this.state.squares.slice())
+    )}`;
+    const link = document.createElement("a");
+    link.href = jsonString;
+    link.download = "data.json";
+
+    link.click();
+  }
+
   renderSquare(i) {
     return (
       <Square
@@ -55,18 +66,23 @@ class Board extends React.Component {
     return (
       <div>
         <div className="gridtitle">{gridtitle}</div>
-        <button
-          className="obstacle"
-          onClick={() => (this.state.obstacleIsTrue = true)}
-        >
-          Obstacle
-        </button>
-        <button
-          className="erase"
-          onClick={() => (this.state.obstacleIsTrue = false)}
-        >
-          Erase
-        </button>
+        <div>
+          <button
+            className="obstacle"
+            onClick={() => (this.state.obstacleIsTrue = true)}
+          >
+            Obstacle
+          </button>
+          <button
+            className="erase"
+            onClick={() => (this.state.obstacleIsTrue = false)}
+          >
+            Erase
+          </button>
+          <button className="Download" onClick={this.exportData()}>
+            Download
+          </button>
+        </div>
         <div>{row}</div>
       </div>
     );
