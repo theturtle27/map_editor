@@ -50,3 +50,26 @@ ul {
 .game-info {
   margin-left: 20px;
 }
+
+.obstacle {
+  margin-bottom: 20px;
+}
+
+.erase {
+  margin-bottom: 20px;
+  margin-left: 5px;
+}
+
+.increase {
+  margin-bottom: 20px;
+  margin-left: 5px;
+}
+
+.decrease {
+  margin-bottom: 20px;
+  margin-left: 5px;
+}
+
+.download {
+  margin-top: 20px;
+}

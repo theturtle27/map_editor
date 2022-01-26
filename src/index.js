@@ -1,6 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
+import Slider from "./slider";
+import Button from "react-bootstrap/Button";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function Square(props) {
   return (
@@ -16,8 +19,9 @@ class Board extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      squares: Array().fill(null),
+      squares: Array(25).fill("0"),
       obstacleIsTrue: true,
+      size: 5,
       row: 0,
       col: 0,
     };
@@ -26,7 +30,7 @@ class Board extends React.Component {
 
   handleClick(i) {
     const squares = this.state.squares.slice();
-    squares[i] = this.state.obstacleIsTrue ? "@" : null;
+    squares[i] = this.state.obstacleIsTrue ? "@" : "0";
     this.setState({ squares: squares });
   }
 
@@ -39,13 +43,37 @@ class Board extends React.Component {
       "col here"
     );
     // console.log(this.state.squares);
+    const jsonDict = { size: this.state.size, array: this.state.squares };
     const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
-      JSON.stringify(this.state.squares)
+      JSON.stringify(jsonDict)
     )}`;
+    console.log(jsonString);
     const link = document.createElement("a");
     link.href = jsonString;
     link.download = "data.json";
     link.click();
+  };
+
+  increaseSize = () => {
+    this.setState({
+      size: this.state.size + 1,
+      squares: Array((this.state.size + 1) * (this.state.size + 1)).fill("0"),
+    });
+  };
+
+  decreaseSize = () => {
+    this.setState({
+      size: this.state.size - 1,
+      squares: Array((this.state.size - 1) * (this.state.size - 1)).fill("0"),
+    });
+  };
+
+  obstacleClick = () => {
+    this.setState({ obstacleIsTrue: true });
+  };
+
+  eraseClick = () => {
+    this.setState({ obstacleIsTrue: false });
   };
 
   renderSquare(i) {
@@ -60,7 +88,8 @@ class Board extends React.Component {
   render() {
     const gridtitle = "GRID MAP";
 
-    let boardWidth = 10;
+    let boardWidth = this.state.size;
+
     const row = [];
     let k = 0; //key
     for (let i = 0; i < boardWidth; i++) {
@@ -75,28 +104,44 @@ class Board extends React.Component {
         </div>
       );
     }
-    // this.setState({ row });
     return (
       <div>
         <div className="gridtitle">{gridtitle}</div>
         <div>
-          <button
+          <Button
+            style={{
+              backgroundColor:
+                this.state.obstacleIsTrue === true ? "green" : null,
+            }}
             className="obstacle"
-            onClick={() => (this.state.obstacleIsTrue = true)}
+            onClick={() => this.obstacleClick()}
           >
             Obstacle
-          </button>
-          <button
+          </Button>
+          <Button
+            style={{
+              backgroundColor:
+                this.state.obstacleIsTrue === false ? "green" : null,
+            }}
             className="erase"
-            onClick={() => (this.state.obstacleIsTrue = false)}
+            onClick={() => this.eraseClick()}
           >
             Erase
-          </button>
-          <button className="Download" onClick={() => this.exportData()}>
+          </Button>
+          <Button className="increase" onClick={() => this.increaseSize()}>
+            +
+          </Button>
+          <Button className="decrease" onClick={() => this.decreaseSize()}>
+            -
+          </Button>
+        </div>
+        <div>{row}</div>
+        <div>
+          {/* use arrow method */}
+          <button className="download" onClick={() => this.exportData()}>
             Download
           </button>
         </div>
-        <div>{row}</div>
       </div>
     );
   }
