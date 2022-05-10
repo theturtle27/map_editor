@@ -9,7 +9,6 @@ class Board extends React.Component {
     this.state = {
       squares: Array(25).fill("."),
       obstacleIsTrue: null,
-      size: 5,
       row: 5,
       col: 5,
       percentage: 0,
@@ -24,39 +23,38 @@ class Board extends React.Component {
   }
 
   randomiseClick = () => {
-    this.setState({ squares: Array(300).fill(".") });
     let numberOfSquares = this.state.col * this.state.row;
     let numberOfObstacles = (this.state.percentage / 100) * numberOfSquares;
-    console.log(this.state.percentage / 100);
-    numberOfObstacles = numberOfObstacles | 0;
+    numberOfObstacles = Math.floor(numberOfObstacles);
     console.log(numberOfObstacles);
-    const squares = this.state.squares.slice();
-    for (let i = 0; i < numberOfSquares; i++) {
-      let x = 0;
-      x = Math.random();
-      console.log(x);
-      if (x < this.state.percentage / 100) squares[i] = "@";
-      else squares[i] = ".";
+    const squares = Array(numberOfSquares).fill(".");
+    let preShuffleArray = Array.from(Array(numberOfSquares).keys());
+    let arrayLength = preShuffleArray.length;
+    for (var i = preShuffleArray.length - 1; i > 0; i--) {
+      const swapIndex = Math.floor(Math.random() * (i + 1));
+      const currentCard = preShuffleArray[i];
+      const cardToSwap = preShuffleArray[swapIndex];
+      preShuffleArray[i] = cardToSwap;
+      preShuffleArray[swapIndex] = currentCard;
     }
+    for (var i = 0; i < numberOfObstacles; i++) {
+      squares[preShuffleArray[i]] = "@";
+    }
+    // for (let i = 0; i < numberOfSquares; i++) {
+    //   let randomIndex = 0;
+    //   randomIndex = Math.floor(Math.random() * arrayLength);
+    //   [preShuffleArray[randomIndex], preShuffleArray[arrayLength - 1]] = [
+    //     preShuffleArray[arrayLength - 1],
+    //     preShuffleArray[randomIndex],
+    //   ];
+    //   squares[preShuffleArray[arrayLength - 1]] = "@";
+    //   arrayLength--;
+    //   preShuffleArray.pop();
+    // }
     this.setState({ squares: squares });
-
-    console.log(numberOfObstacles);
   };
 
   exportData = () => {
-    console.log(
-      "Download",
-      this.state.row,
-      "row here",
-      this.state.col,
-      "col here"
-    );
-    // console.log(this.state.squares);
-    const jsonDict = {
-      row: this.state.row,
-      col: this.state.col,
-      array: this.state.squares,
-    };
     const array = [];
     for (let i = 0; i < this.state.row; i++) {
       const row = [];
@@ -68,11 +66,9 @@ class Board extends React.Component {
       }
       array.push(row);
     }
-    console.log("array test:", array);
     const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
       JSON.stringify(array)
     )}`;
-    console.log(jsonString);
     const link = document.createElement("a");
     link.href = jsonString;
     link.download = "data.json";
@@ -110,28 +106,35 @@ class Board extends React.Component {
   };
 
   handleFile = (event) => {
-    console.log("event.target.files test:", event.target.files);
     // FileReader is built in to browser JS
     const fileReader = new FileReader();
-
     // Convert file to text
     fileReader.readAsText(event.target.files[0], "UTF-8");
+    let fileName = event.target.files[0].name;
+    var fileExtension = fileName.split(".").pop();
 
     // When file is convertgged...
     fileReader.onload = (event) => {
-      console.log("event.target.result", event.target.result);
+      // File extension check
+      if (fileExtension !== "json") {
+        window.alert("Filetype is not supportted. You must use .json");
+        return false;
+      }
       // Convert text to JS data
       const data = JSON.parse(event.target.result);
 
       // Updata state with file data
-      const { row, col, array } = data;
-      console.log("data", data);
+      const array = data.flat();
+      const row = data.length;
+      const col = data[0].length;
+
       this.setState({ row, col, squares: array });
     };
+    event.target.value = null;
   };
 
   render() {
-    const gridtitle = "GRID MAP";
+    const gridtitle = "MAP EDITOR";
 
     let boardWidth = this.state.row;
     let boardLength = this.state.col;
